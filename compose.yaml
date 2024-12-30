@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  # Spring Boot Application Service
+  app:
+    image: your-spring-boot-image:latest
+    build: .
+    container_name: user-service-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/mydb
+      - SPRING_DATASOURCE_USERNAME=myuser
+      - SPRING_DATASOURCE_PASSWORD=mypassword
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9093
+      - JWT_SECRET=mySuperSecretKey
+      - JWT_EXPIRATION=3600000
+    depends_on:
+      - db
+      - kafka
+    networks:
+      - mynetwork
+
+  # PostgreSQL Database Service
+  db:
+    image: postgres:13
+    container_name: user-service-db
+    environment:
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypassword
+      - POSTGRES_DB=mydb
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - mynetwork
+
+  # Kafka Service
+  kafka:
+    image: wurstmeister/kafka:latest
+    container_name: user-service-kafka
+    environment:
+      KAFKA_ADVERTISED_LISTENER: INSIDE_KAFKA:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL: PLAINTEXT
+      KAFKA_LISTENER_NAME_EXTERNAL: EXTERNAL
+      KAFKA_LISTENER_NAME_INTERNAL: INSIDE
+      KAFKA_LISTENER_PORT: 9093
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_INTER_BROKER_SECURITY_PROTOCOL: PLAINTEXT
+      KAFKA_LISTENER_INTER_BROKER_PORT: 9093
+    ports:
+      - "9093:9093"
+    depends_on:
+      - zookeeper
+    networks:
+      - mynetwork
+
+  # Zookeeper Service
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    container_name: user-service-zookeeper
+    ports:
+      - "2181:2181"
+    networks:
+      - mynetwork
+
+volumes:
+  postgres-data:
+
+networks:
+  mynetwork:
+    driver: bridge
