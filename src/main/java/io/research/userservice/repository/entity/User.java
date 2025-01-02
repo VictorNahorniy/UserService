@@ -6,7 +6,7 @@ import jakarta.persistence.GenerationType;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 
-@Entity(name = "user")
+@Entity(name = "userEntity")
 @Setter
 public class User {
 
