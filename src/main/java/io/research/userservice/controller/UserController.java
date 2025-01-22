@@ -2,6 +2,10 @@ package io.research.userservice.controller;
 
 import io.research.userservice.repository.entity.User;
 import io.research.userservice.service.UserService;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +21,13 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
-        return ResponseEntity.ok(userService.register(user));
+    public ResponseEntity<User> register(@RequestBody UserDTO user) {
+        return ResponseEntity.ok(userService.register(User.builder()
+                        .isActive(true)
+                        .password(user.getPassword())
+                        .username(user.getUsername())
+                .build()
+        ));
     }
 
     @GetMapping("/{id}")
@@ -40,5 +49,21 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{userId}/isAdmin")
+    public boolean isUserAdmin(@PathVariable Long userId) {
+        // Логіка для перевірки, чи є користувач адміністратором
+        return userService.isAdmin(userId);
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserDTO {
+        @NonNull
+        private String username;
+        @org.springframework.lang.NonNull
+        private String password;
     }
 }

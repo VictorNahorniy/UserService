@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class KafkaProducer {
     private final KafkaTemplate<String, String> kafkaTemplate;
-    private final String userCreatedTopic = "user-created";
 
     public KafkaProducer(KafkaTemplate<String, String> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
@@ -15,6 +14,7 @@ public class KafkaProducer {
 
     public void sendUserCreatedEvent(User user) {
         String message = "User created: " + user.getUsername();
+        String userCreatedTopic = "user-created";
         kafkaTemplate.send(userCreatedTopic, message);
     }
 }
