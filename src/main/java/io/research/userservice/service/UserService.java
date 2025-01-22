@@ -51,4 +51,9 @@ public class UserService {
         User user = getUserById(id);
         userRepository.delete(user);
     }
+
+    public boolean isAdmin(Long userId) {
+        User user = getUserById(userId);
+        return user.getRole().equals("ADMIN");
+    }
 }
